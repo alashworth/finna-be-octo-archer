@@ -1,23 +1,22 @@
-\chapter{Hardware Overview}
+\chapter{Board Overview}
 
-The designed board is a small, credit-card sized wireless sensor node. Temperature, humidity, and ambient light-levels are measured on-board, with the remaining micro-controller input-output broken out to a standard 0.1" pitch header for easy expandability. 
+\section{Hardware Overview}
+The designed board is a small, credit-card sized wireless sensor node. Temperature, humidity, and ambient light-levels are measured on-board, with the remaining micro-controller input-output broken out to a standard 0.1" pitch header for easy expandability. The board is based on the Texas Instruments CC3200, an ARM-M4 MCU and 802.11 radio SoC. 
 
-\section{Specifications}
+\missingfigure{Board component-level block diagram}
 
-\begin{table}[h]
-	\centering
-	\begin{tabular}{l|l}
-		BOM Cost                 & \$25                       \\
-		SOC                      & Texas Instruments CC3200   \\
-		Radio                    & Integrated on-chip 802.11x \\
-		RAM                      &                            \\
-		ROM                      &                            \\
-		Antenna                  &                            \\
-		Peripherals              &                            \\
-		Power Consumption (avg.) &                            \\
-		Size                     &                            \\
-		Weight                   &                            \\
-		Wireless Range           &                            \\
-		Power Source             &                           
-	\end{tabular}
-\end{table}
+The sensor node is designed to be small and non-invasive for easy deployment in residential and outdoor areas. The dimensions are sized to fit a standard Pelican 1010-series micro case, if a case is needed for outdoor, battery-powered operation. This case is rugged, waterproof, and made of transparent (optical and RF) polycarbonate.
+
+The system is designed to run autonomously with little interaction by the user. Accordingly, there are no buttons or switches on the board, but if user interaction is required, they can be added to the 0.1" header.
+
+The board is very flexible, and contains spare computational and memory capacity. The ARM-M4 microcontroller run at X MHz using an external crystal oscillator. It has Y program, memory, Z RAM, ADCs, blah, blah, add stuff from datasheet here. The current firmware load uses only AX kilobytes. New firmware loads can be easily inserted as a result.
+
+\missingfigure{table of mcu characteristics}
+
+The board microcontroller runs an event-based scheduling framework combined with a very simple, cooperative multitasking kernel, both sourced and ported from the GPL-licensed QP Framework\cite{qp framework}. There is very little hardware abstraction; peripherals and MCU features must be directly programmed and accessed. New events are easily created and assigned to the kernel scheduler, which schedules all tasks in a run-to-completion fashion. 
+
+\section{Related Devices}
+
+
+
+
