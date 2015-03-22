@@ -1,6 +1,6 @@
-\chapter{Board Overview}
+\chapter{Hardware}
 
-\section{Hardware Overview}
+\section{Board Overview}
 The designed board is a small, credit-card sized wireless sensor node. Temperature, humidity, and ambient light-levels are measured on-board, with the remaining micro-controller input-output broken out to a standard 0.1" pitch header for easy expandability. The board is based on the Texas Instruments CC3200, an ARM-M4 MCU and 802.11 radio SoC. 
 
 \missingfigure{Board component-level block diagram}
@@ -15,8 +15,12 @@ The board is very flexible, and contains spare computational and memory capacity
 
 The board microcontroller runs an event-based scheduling framework combined with a very simple, cooperative multitasking kernel, both sourced and ported from the GPL-licensed QP Framework\cite{qp framework}. There is very little hardware abstraction; peripherals and MCU features must be directly programmed and accessed. New events are easily created and assigned to the kernel scheduler, which schedules all tasks in a run-to-completion fashion. 
 
+\section{Antenna Design}
+
+Write about inverted f-antennas.
+
 \section{Related Devices}
 
-
+Write stuff here about other motes.
 
 
