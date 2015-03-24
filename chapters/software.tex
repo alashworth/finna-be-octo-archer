@@ -1,1 +1,34 @@
-\chapter{Software Features}
+\chapter{Firmware Design}
+
+The designed board uses a Texas Instruments CC3200 SoC. It contains both an ARM M4 application processor, as well as an 802.11 transceiver, integrated into one package. It is programmed via a USB to JTAG FTDI adapter; or if this is not desired, the JTAG pins are broken out into exposed contacts on the board. The micro-controller contains a large panopoly of peripherals; for a full list the datasheet should be consulted\todo{insert reference here}.
+
+The applications processor runs an event-based scheduling framework combined with a very simple, cooperative multitasking kernel, both sourced and ported from the GPL-licensed QP Framework\todo{add QP framework citation}. There is very little hardware abstraction; peripherals and MCU features must be directly programmed and accessed. New events are easily created and assigned to the kernel scheduler, which schedules all tasks in a run-to-completion fashion. Given that the hard real-time demands of the networking subsystem are serviced in a separate, dedicated transceiver, a cooperative, non-preemptive kernel is simple to implement, uses less stack and memory space, and does not suffer from the complexity of traditional preemptive real-time operating systems (RTOSes).
+ 
+\section{Radio Duty Cycling, Data Aggregation, and Low Power Modes}
+
+Wireless transmission and receive are the dominant power consumers in most battery-powered devices. The board designed here is no exception, with energy consumption dominated by the transceiver. A representative pie chart has been calculated assuming the transmission of one 8-bit sample per second, and is shown below.
+
+\missingfigure{Relative power consumption of different subsystems}
+
+From the pie chart, it is clear that the energy consumption bottleneck lies in the wireless radio. Several techniques can be used here to reduce power consumption: compressing the data stream, and employing burst transmissions.
+
+\subsection{Burst Transmission}
+
+A wireless sensor node spends most of time engaged in one-way communication. Very rarely does it need to be actively listening for commands from another device. If the node collects data at a fixed rate, then the radio on time can be minimized by buffering as much data as possible, and then transmitting it. At all other times, the radio can be placed in a power-saving idle or sleep mode. This trades power consumption for data latency and device memory.
+
+Let the average power drawn by the radio during bursts be defined as $P_{B}$. Then, 
+
+\begin{equation}
+P_{B} = \frac{1}{T_{B}}[E_{oh} + T_{TX} +(T_{B}-T_{TX})P_{idle}]\cite{calhoun2005design}
+\end{equation}
+
+where $T_{B}$ is the period between bursts, $E_{oh}$ is the radio on/off power toggling cost, $T_{TX}$ is the transmission time, $P_{TX}$ is the power consumed during transmission, and $P_{idle}$ is the power consumed while the radio is asleep.
+
+
+
+ 
+\section{Server Data Storage}
+\section{Rest API Interface}
+\section{Data Compression}
+\subsection{Goulomb Coding}
+

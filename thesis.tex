@@ -3,6 +3,11 @@
 \usepackage{graphicx}
 \usepackage{lineno}
 \usepackage{todonotes}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{tabulary}
+\usepackage{appendix}
+\usepackage{minted}
 \linenumbers
 \author{Andrew Ashworth}
 \title{Versatile environmental monitoring platform}
@@ -38,5 +43,10 @@
 \backmatter
 \bibliography{./bibliography/mybib}
 \bibliographystyle{plain}
+
+\begin{appendices}
+\include{chapters/hw_sch}
+\include{chapters/software_code}
+\end{appendices}
 
 \end{document}
