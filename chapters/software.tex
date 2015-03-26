@@ -6,6 +6,12 @@ The applications processor runs an event-based scheduling framework combined wit
  
 \section{Radio Duty Cycling, Data Aggregation, and Low Power Modes}
 
+The node design is based on the following low duty cycle principle: the node is asleep for the majority of the time, wakes up quickly on an event, processes, and returns to sleep. For the lowest power consumption, the standby current and wakeup time (time to transition from sleep to active mode) must be minimized\cite{puccinelli2005wireless} since the the active portion of a sensor network application is typically extremely small\cite{shnayder2004simulating}. 
+
+!!!Integration of programming, communication, storage, and sensing allows researchers to utilize more functionality and develop more robust systems.
+
+\todo{reword above paragraph}
+
 Wireless transmission and receive are the dominant power consumers in most battery-powered devices. The board designed here is no exception, with energy consumption dominated by the transceiver. A representative pie chart has been calculated assuming the transmission of one 8-bit sample per second, and is shown below.
 
 \missingfigure{Relative power consumption of different subsystems}
