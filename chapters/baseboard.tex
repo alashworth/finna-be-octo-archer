@@ -1,9 +1,28 @@
 \chapter{Hardware}
 
 \section{Board Overview}
-The principal aim of the design was to develop an energy and reasonably cost-efficient wireless sensing platform, with easy expandability so as to support arbitrary sensor attachments. As a result, the designed board is a small, credit-card sized circuit board. Temperature, humidity, and ambient light-levels are measured on-board, while the remaining micro-controller general purpose input-output (GPIO) is broken out to a standard 0.1" pitch header. The board is based on the Texas Instruments CC3200 system-on-a-chip (SOC), containing an ARM-M4 MCU and an 802.11 WiFi radio.
+The principal aim of the design was to develop an energy and reasonably cost-efficient wireless sensing platform, with easy expandability so as to support arbitrary sensor attachments. This section discusses the design and implementation of the board, along with the rationale behind certain hardware choices.
 
-\missingfigure{Board component-level block diagram}
+The designed sensor platform is a small, credit-card sized board. Temperature, humidity, and ambient light-levels are measured on-board, while the remaining micro-controller general purpose input-output (GPIO) is broken out to a standard 0.1" pitch header. The board is based on the Texas Instruments CC3200 system-on-a-chip (SOC), containing an ARM-M4 MCU and an 802.11 WiFi radio.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\linewidth]{images/cc3200-block}
+\caption[CC3200 Block Diagram]{Block diagram of CC3200 functionality\cite{2015}}
+\label{fig:cc3200-block}
+\end{figure}
+
+
+The Texas Instruments CC3200 was chosen after evaluating several different chips from Freecale, Atmel, and Motorola, and other chips manufactured by Texas Instruments such as the MSP430. In comparison with other popular embedded chips, the CC3200 is neither very low power nor is it very inexpensive. However, it has several advantages as a chipset for a residential sensing platform. First, it supports 802.11b/g/n, which is ubiquitous in residential buildings. Given the typical 4-5 node scale of an ecoMOD deployment, not having to purchase an inter-networking gateway more than makes up for the slightly higher cost of the chip, which is around \$11 in quantity from DigiKey. Second, it is based on the Arm Cortex-M4 microcontroller, which means it can be programmed with open-source (i.e., free) toolchains. Finally, the CC3200 is a hybrid package, with an integrated balun and matching network. Any single-ended 50 Ohm antenna can be connected and it will theoretically just work, which is the exception, and not the rule. 
+
+IEEE 802.11 (WiFi) has traditionally been used to provide high-speed, moderate range data transfer. Typical systems utilizing it have been fast but not energy-efficient, which has led to the perception of it being unsuitable for use in long-lifetime battery-powered devices. However, this is not from any inherent inefficiency in the protocol. In fact, the raw energy per bit transmitted is competitive with other protocols such as 802.15.4 or Bluetooth Low-Energy\cite{DanielDobkin2009}. In wireless device applications, power usage is dominated by one of four things:
+
+\begin{description}
+\item[Duty cycle] the ratio of device operation time to device idle time
+\item[Protocol efficiency] different protocols lead to various amounts of communication overhead, and each one is tuned for different operating environments
+\item[TX power] how efficient power is used to transmit, along with the efficiency of the transmit amplifier
+\item[Signal processing] how much energy is consumed by the microcontroller in processing and acquiring data 
+\end{description}
 
 The sensor node is designed to be small and non-invasive for easy deployment in residential and outdoor areas. The dimensions are sized to fit a standard Pelican 1010-series enclosure, so as to support an outdoor, battery-powered usage case. This case is rugged, waterproof, and made of transparent (optical and RF) polycarbonate.
 

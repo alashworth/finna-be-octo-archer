@@ -15,45 +15,42 @@ Existing commercial monitoring solutions usually suffer the following problem: e
 
 In this thesis, the design of a new sensing platform is presented. It is an extension of monitoring work that has been done continuously since the inception of the project, while introducing the foundations for future work in enabling environmental control by increasing platform capability. It is an evolutionary improvement over previous work done by Ernest Bowden in developing a development platform based around the MSP430 for the ecoMOD project\cite{Bowden2009}. The design was conducted with three major goals compared to previous work: easier deployments, increased robustness for experimentation, and retaining a low power consumption envelope. The designed node accomplishes this through three methods: use of 802.11 and Internet communication protocols for deployability, increased microprocessor speed and memory, and a very aggressive sleep schedule combined with a responsive, event-based software framework.
 
-http://ieeexplore.ieee.org/xpls/icp.jsp?arnumber=1440950#ref_2
-http://www.cmu.edu/gdi/docs/enhancing-electricity.pdf
-
 \section{Related Work}
 
-As mentioned previously, commercial sensor deployments from vendors such as National Instruments (NI) were used to instrument the first ecoMOD housing iterations\cite{Kidd2007}. However, as a business-focused product, the NI system was extremely expensive, with a small sensor deployment costing over \$10,000. Subsequent ecoMOD installations used a mixture of purpose-built electronics together with commercial-off-the-shelf (COTS) systems for monitoring. These included systems such as The Energy Detective (TED) from Energy Inc. (2009), and the Vantage Vue weather station from Davis Instruments. In general, this approach worked, but was difficult to integrate into a whole sensing and monitoring system, as each device had it's own unique interface and controls.
+As mentioned previously, commercial sensor deployments from vendors such as National Instruments (NI) were used to instrument the first ecoMOD housing iterations\cite{Kidd2007}. However, as a business-focused product, the NI system was extremely expensive, with a small sensor deployment costing over \$10,000. Subsequent ecoMOD installations used a mixture of purpose-built electronics together with commercial-off-the-shelf (COTS) systems for monitoring. These included systems such as The Energy Detective (TED) from Energy Inc. (2009), and the Vantage Vue weather station from Davis Instruments. In general, this approach worked, but separate sensors were difficult to integrate into a whole sensing and monitoring system, as each device had its own unique interface and controls.
 
-Failure to inter-operate is a well-known limitation of existing sensor network deployments. Commercially available devices use incompatible physical and application layer interfaces. At the physical layer, the most popular of these include IEEE 802.15.4, Bluetooth low-energy, and IEEE 802.11. At the application layer, Zigbee, Z-Wave, WirelessHART, and CoAP all enjoy significant mindshare. While there has been a push from industry players towards standardization of application and physical layer protocols, the market remains fragmented and many vendors lock customers in with proprietary and incompatible interfaces.
+Failure to inter-operate is a well-known limitation of existing sensor network deployments. Commercially available devices use incompatible physical and application layer interfaces. At the physical and associated low communication layers, the most popular of these include IEEE 802.15.4, Bluetooth Low-energy, and IEEE 802.11. At the application layer, Zigbee, Z-Wave, WirelessHART, and the Constrained Application Protocol (CoAP) all enjoy significant mindshare. While there has been a push from industry players towards standardization of application and physical layer protocols, the market remains fragmented and many vendors lock customers in with proprietary, incompatible, and undocumented interfaces.
 
-As the capabilities of microcontrollers increase, For a great deal of time, Internet Protocol (IP) was not used because it was considered inappropriate for use in distributed wireless sensor networks. Traditional mobile WiFi chips were targeted at laptops and cell-phones, which could be recharged on a daily or hourly basis. In addition, the protocol required too many computing resources as a proportion of microcontroller capability, especially at WiFi's higher data rates and encryption complexities. However, the problem has been solved from two sides. First, the steady advance of Moore's Law has brought down the cost in power and money of embedding computing capability. Second, the IETF has defined several reduced-functionality subsets of IP that can be implemented on smaller computers. These standards include IEEE 802.15.4, Routing over Low-Powered Lossy Networks (ROLL), and Constrained Application Protocol (CoAP). 
+As the capabilities of microcontrollers increase, new choices in communication protocals become feasible. For a great deal of time, Internet Protocol (IP) was not used because it was considered inappropriate for use in embedded wireless sensor networks. Traditional mobile WiFi chips were targeted at laptops and cell-phones, which needed to be recharged on a daily or hourly basis. In addition, the protocol required too many computing resources as a proportion of microcontroller capability, especially at WiFi's higher data rates and encryption complexities. However, the problem has been solved from two sides. First, the steady advance of Moore's Law has brought down the cost in power and money of embedding computing capability. Second, the IETF has defined several reduced-functionality subsets of certain IP or IP-related protocols that can be implemented on resource-constrained computers, e.g. 6LowPAN\cite{Montenegro2007}, RoLL\cite{RFC6550}, CoAP\cite{Z.Shelby2014}. The usage of Internet protocols has even been adopted by the ZigBee Alliance (an industry association of electronics manufacturers) in their "ZigBee IP" networking specification.
 
-The device designed in this thesis utilizes a full 802.11 Internet stack along with an open hypertext interface. The adoption of IP for wireless sensor networks will speed their deployment and adoption. Communication compatibility between disparate devices will enable more competition between manufacturers, lower costs, and facilitate the creation of new services which span multiple sensor deployments. It will also allow the easy use of well-known Web technologies for aggregating and displaying sensor information.
-
-\section{Related Devices}
+The device designed in this thesis utilizes a full 802.11-compatible communication stack along with an  hypertext transport protocol (HTTP) interface. The adoption of IP/HTTP for wireless sensor networks will speed their deployment and adoption. Communication compatibility between disparate devices will enable more competition between manufacturers, lower costs, and facilitate the creation of new services which span multiple sensor deployments. It will also allow the easy use of well-known Web technologies for aggregating and displaying sensor information.
 
 \begin{figure}[h]
-\includegraphics{images/telosB}
+\includegraphics[width=0.4\textwidth]{images/telosb}
 \caption{TelosB Sensor Mote\cite{1440950}}
 \label{telosB}
 \end{figure}
 
-In wireless sensor network (WSN) research, a sensor node is popularly known as a "mote", which comes from the idea that future sensor nodes will be as ubiquitous as dust motes in an Internet cloud of devices. These existing devices have been used for many years to investigate new networking techniques and to collect data for environmental monitoring. As a result, the explored design space is similar to what is designed in this thesis. 
+Residential environmental monitoring can be considered a subset of the broader networked sensor market. In academic wireless sensor network (WSN) research, a sensor node is popularly known as a "mote", which comes from the idea that future sensor nodes will be as ubiquitous as dust motes in an Internet cloud of devices. These existing devices have been used for many years to investigate new networking techniques and to collect data for environmental monitoring. As a result, the explored design space is similar to what is designed in this thesis. 
 
 There are many commercially available motes. Interest in distributed sensing has only increased with the ongoing media coverage of the possibilities of the "Internet of Things", which is the idea that all future electronic devices will be seamlessly interconnected via the Internet due to rapidly declining costs in wireless technology. 
 
-Typical mote characteristics are described in Table \ref{mote_characteristics}. Generally, they include several default sensors, a low-power transceiver, an 8-bit microcontroller, and tens of kilobytes of code data and storage. As development boards they have many pins broken out for easy expandability. While bare-metal programming of these devices is popular, two operating systems exist for these platforms, where new networking and application layer protocols are tested and researched. These are Berkeley's TinyOS, and the Swedish Institute of Computer Science's (SICS) ContikiOS.
+Typical mote characteristics are described in Table \ref{mote_characteristics}. Generally, they include several default sensors, a low-power transceiver, an 8-bit microcontroller, and tens of kilobytes of code data and storage. As development boards they have many pins broken out for easy expandability. While bare-metal programming of these devices is popular, two operating systems exist for these platforms, where new networking and application layer protocols are tested and researched. These are Berkeley's TinyOS, and the Swedish Institute of Computer Science's (SICS) ContikiOS. 
 
 \begin{table}[h]
 \begin{tabular}{@{}lllll@{}}
 \toprule
 Processor & Platform Name & Speed (MHz) & Ram (Kb) & Transceiver \\ \midrule
 TI MSP430 & TelosB & 8 & 10 & TI CC2420 \\
-Atmel ATMega 128 & MICA & 8 & 4 & Atmel RF230 \\
+Atmel ATMega 128l & MicaZ & 8 & 4 & TI CC2420 \\
 MC1322x & Econotag & 26 & 128 & MC1322x \\
 Atmel ATMega 128 & Waspmote & 14 & 8 & Varies \\ \bottomrule
 \end{tabular}
 \caption{Typical Mote Characteristics}
 \label{mote_characteristics}
 \end{table}
+
+Perhaps the most popular mote for sensor network research over the past decade has been the Mica-series from MEMSIC Inc. The initial Mica platform was released in 2001\cite{hill2002mica}, with the latest Mica release named the MicaZ. Despite the many years in between, the MicaZ is similar in capabilities to the original Mica, differing only in the radio on-board. The trend in mote development has been to hold microcontroller resources constant, while decreasing per unit cost. The defining feature of the research in this area has been in the adaptations necessary for computations on limited and resource-constrained devices. 
 
 \section{Contributions}
 
