@@ -5,15 +5,91 @@ The principal aim of the design was to develop an energy and reasonably cost-eff
 
 The designed sensor platform is a small, credit-card sized board. Temperature, humidity, and ambient light-levels are measured on-board, while the remaining micro-controller general purpose input-output (GPIO) is broken out to a standard 0.1" pitch header. The board is based on the Texas Instruments CC3200 system-on-a-chip (SOC), containing an ARM-M4 MCU and an 802.11 WiFi radio.
 
-\begin{figure}
+\section{Microcontroller}
+
+\begin{table}[h]
+\caption{Microcontroller comparison}
+\label{uc-comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l|llll@{}}
+ & Texas Instruments CC3200 & Freescale Kinetis KW2x & ST Microelectronics STM32W108CB & Atmel ATSAMR21E17A \\ \midrule
+Flash Memory & External & Up to 512 KB & Up to 256 KB & Up to 256 KB \\
+RAM & Up to 256 kB & Up to 64 KB & Up to 16 KB & Up to 32 KB \\
+Processor & ARM Cortex-M4 & ARM Cortex-M4 & ARM Cortex-M3 & ARM Cortex-M0+ \\
+Clock frequency & 80 MHz & 50 MHz & 24 MHz & 48 MHz \\
+Operating Current ex. Transceiver & 15.3 mA @ 3.6V & 17 mA @ 3.0 V & Not specified & Not specified \\
+ADC & 12 bit SAR & 16 bit SAR & 12-bit Sigma Delta & 12-bit SAR \\
+In-application programming & Yes & Yes & Yes & Yes \\
+Operating Voltage & 2.1V - 3.6V & 1.8V - 3.6V & 2.1V - 3.6V & 1.8V - 3.6V \\
+General purpose I/O pins & 27 & 24 & 24 & 28
+\end{tabular}
+}
+\end{table}
+
+The Texas Instruments CC3200 was chosen after evaluating several different chips from Freecale, Atmel, and other manufacturers. A sample comparison is presented in table \ref{uc-comparison}. Important characteristics for a microcontroller were: 1) power consumption, 2) memory size, 3) easy of programmability, and 4) transceiver integration. The CC3200 is neither very low power nor is it very inexpensive due to requiring an external flash memory module. However, it has several advantages as a chipset for a residential sensing platform. First, it supports 802.11b/g/n, which is ubiquitous in residential buildings. Given the typical 4-5 node scale of an ecoMOD deployment, not having to purchase an inter-networking gateway more than makes up for the slightly higher cost of the chip, which is around \$11 in quantity from DigiKey. Second, it is based on the Arm Cortex-M4 microcontroller, which means it can be programmed with open-source (i.e., free) toolchains, and has a floating-point coprocessor for digital signal processing. Finally, the CC3200 is a hybrid package, with an integrated balun and matching network. Any single-ended 50 Ohm antenna can be connected and it will theoretically just work, which is the exception, and not the rule.
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.5\linewidth]{images/cc3200-block}
 \caption[CC3200 Block Diagram]{Block diagram of CC3200 functionality\cite{2015}}
 \label{fig:cc3200-block}
 \end{figure}
 
+\section{Sensors}
 
-The Texas Instruments CC3200 was chosen after evaluating several different chips from Freecale, Atmel, and Motorola, and other chips manufactured by Texas Instruments such as the MSP430. In comparison with other popular embedded chips, the CC3200 is neither very low power nor is it very inexpensive. However, it has several advantages as a chipset for a residential sensing platform. First, it supports 802.11b/g/n, which is ubiquitous in residential buildings. Given the typical 4-5 node scale of an ecoMOD deployment, not having to purchase an inter-networking gateway more than makes up for the slightly higher cost of the chip, which is around \$11 in quantity from DigiKey. Second, it is based on the Arm Cortex-M4 microcontroller, which means it can be programmed with open-source (i.e., free) toolchains. Finally, the CC3200 is a hybrid package, with an integrated balun and matching network. Any single-ended 50 Ohm antenna can be connected and it will theoretically just work, which is the exception, and not the rule. 
+An environmental monitoring platform is useless without some way of measuring the environment. Although the design includes a 0.1" header for expandability, light, temperature, and humidity sensing was included on board. Where possible, I2C compatible sensors were chosen for ease of integration and lowered parts count. The sensor characteristics are summarized in table \ref{sensor-specs}. The bottom two entries in the table consist of external sensors that were connected to the microcontroller's ADC. 
+
+\begin{table}[h]
+\caption{Sensor specifications}
+\label{sensor-specs}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l|llllll@{}}
+ & Active Power Use & Operating Voltage & Sense range & Accuracy & Interface & Product No. \\ \midrule
+Temperature & \multirow{2}{*}{27 uW combined} & 1.5V -3.6V &  & 0.3degC & I2C & HTU21D(F) \\
+Humidity &  & 1.5V-3.6V & 0-100\% RH & 2\% RH & I2C & HTU21D(F) \\
+Light & 0.75 mW & 2.7V-3.6V & Up to 40 kLux & Wavelength dependent & I2C & TSL2561 \\
+Force & passive resistive & N/A & up to 1000 lbs & 3\% of max range & Analog & ZFLEXA201 \\
+Soil Moisture & 24 mW & 3.5V - 20V & 0-50\% water by volume & 2\% & Analog & VH400
+\end{tabular}
+}
+\end{table}
+
+\subsection{Light}
+
+The light sensor is the TSL2561. The response curve approximates the sensitivity of the human eye. Light levels are important in measuring solar insolation, which affects building heating and cooling schedules. This particular sensor contains two photodiodes on board - one more responsive to infra-red, and the other with an even full-spectrum frequency response curve. It is pre-calibrated from the manufacturer, and utilizes an SMBus/I2C interface.
+
+\section{Humidity and Temperature}
+
+The board mounts an integrated relative humidity and temperature sensor from Taos: the TSL2561. Accurate measurement of relative humidity is highly dependent on the atmospheric temperature. As a result, most instrumentation-grade humidity sensors come with a temperature sensor for free. The sensor is based on sensing changes in capacitance, and comes pre-calibrated from the factory. Humidity and temperature must be known in order to determine heating and cooling energy expenditures.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\linewidth]{images/sbrk-proto}
+\caption[Development breakout]{Breakout board containing quad op-amp for soil moisture voltage division, humidity, temperature, and light sensor}
+\label{fig:sbrk-proto}
+\end{figure}
+
+\section{Force}
+    
+A piezoelectric resistive force sensor from Flexiforce was tested. Force and pressure measurements are useful for measuring foot traffic. 
+
+\missingfigure{Force sensor analog circuit schematic}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.33\linewidth]{images/force-proto}
+\caption[Force sensor prototype]{Force sensor prototype circuit with an analog low-pass filter and adjustable gain}
+\label{fig:force-proto}
+\end{figure}
+
+\section{Soil Moisture}
+
+A capacitive soil moisture sensor from Vegetronix was tested. Soil moisture was an important environmental measure needed for ecoMOD 4, which had a ground source heat pump. The greater the soil moisture, the more thermal capacity the heat pump has to draw on. The sensor has an output voltage range of 0 to 3V. As the CC3200 ADC inputs can only tolerate a maximum voltage of 1.5V; the sensor output voltage must be divided by two for full range operation.
+
+\missingfigure{op amp divider schematic}
+
+
+\section{Radio}
 
 IEEE 802.11 (WiFi) has traditionally been used to provide high-speed, moderate range data transfer. Typical systems utilizing it have been fast but not energy-efficient, which has led to the perception of it being unsuitable for use in long-lifetime battery-powered devices. However, this is not from any inherent inefficiency in the protocol. In fact, the raw energy per bit transmitted is competitive with other protocols such as 802.15.4 or Bluetooth Low-Energy\cite{DanielDobkin2009}. In wireless device applications, power usage is dominated by one of four things:
 
@@ -78,24 +154,3 @@ A PIFA was designed and simulated in HFSS. The geometry is illustrated in Fig. \
 
 \section{Peripherals}
 \subsection{Soil Moisture}
-
-Zazueta, Fedro S., and Jiannong Xin. "Soil moisture sensors." Soil Sci 73 (1994): 391-401.
-
-A ground-source heat pump (GSHP) was installed at ecoMOD 4. GSHPs transfer heat between the ground and a conditioned room or facility using electrical energy. Heat pump efficiency is inversely proportional to the temperature differential between the source and destination. As opposed to traditional electric air conditioners and heaters which use the ambient air temperature as the source, GSHPs source from the ground, whose temperature is approximately equal to the mean annual temperature year round, or around 50-60 degrees Fahrenheit, leading to generally better efficiency. GSHP installation and use disturbs the soil temperature, so in order to effectively calculate pump efficiency, the surrounding soil temperature and moisture content (which heavily determines the heat capacity of the surrounding soil) must be known.
-
-Soil moisture can be measured in many different ways. However, only a few of these techniques lend themselves to automated electronic sensing, and the most common and widely available are based around either resistive or capacitive sensor methods. 
-
-Capacitive methods involve measuring the dielectric capacitance between two electrodes. This is usually done by measuring the impedance at a specific frequency. The measured impedance is not linearly proportional to the amount of water present, and varies according to the composition and temperature of the measured soil. Therefore, for absolute precision, the sensor must be calibrated against a representative sample of soil and the temperature measured as well. When calibrated, the measurement is generally highly precise and can be measured instantaneously. Capacitive sensors are generally more expensive due to the more precise electronics required and calibration needed for accurate results.
-
-\missingfigure{Irrometer Watermark Sensor}
-
-Resistive techniques measure the DC resistance of a given volume of soil. The most common way of measuring this is by burying a porous gypsum block into the ground along with two electrodes, and allowing the block to come to hydrostatic equilibrium with the surrounding soil. This process usually takes two to three hours, which can also be seen after a rainstorm or other meteorological event. They are electronically simpler and cheaper to manufacture than capacitive sensors, which is an important consideration for their most common use, large-scale agricultural deployments. For many applications, individual block calibration can be ignored, since the gypsum medium is of a well-known composition and possesses a consistent resistivity. However, for long term measurement accuracy, the gypsum block must be continually recalibrated, as soil ions and salts can migrate into the gypsum block matrix, affecting the block resistance.
-
-\missingfigure{Vegetronix}
-
-\subsection{Ambient Humidity and Temperature}
-
-\subsection{Ambient Light}
-
-
-
