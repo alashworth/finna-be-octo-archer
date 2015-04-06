@@ -1,5 +1,7 @@
 \chapter{Hardware}
 
+\missingfigure{Photograph of final board revision} 
+
 \section{Board Overview}
 The principal aim of the design was to develop an energy and reasonably cost-efficient wireless sensing platform, with easy expandability so as to support arbitrary sensor attachments. This section discusses the design and implementation of the board, along with the rationale behind certain hardware choices.
 
@@ -38,22 +40,22 @@ The Texas Instruments CC3200 was chosen after evaluating several different chips
 \begin{table}[h]
 \caption{CC3200 figures of merit}
 \label{CC3200-fom}
-\begin{tabular}{ll}
-Voltage Supply           & 2.1 - 3.6V \\
-Clock Frequency          & 80 MHz     \\
-Maximum Current Draw     & 229 mA     \\
-Sleep, Radio Idle Listen & 695 uA     \\
-Sleep, All               & 129 uA \\
-Hibernation              & 4 uA     \\
-RAM (Code and Data)      & 128 kB     \\
-Serial Flash Storage     & External 8 MB		\\
-Battery Capacity		 & 4000 mAH (2xAA)	      
+\begin{tabular}{@{}l|l@{}}
+\toprule
+Voltage Supply                  & 2.1V - 3.6V \\
+Clock Frequency                 & 80 MHz      \\
+Maximum Current Draw @ 14.5 dBm & 229 mA      \\
+Sleep, Radio Idle Listen        & 695 uA      \\
+Sleep, All Systems              & 129 uA      \\
+Hibernate                       & 4 uA        \\
+RAM                             & 128 KB      \\
+Flash Storage                   &             \\ \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Sensors}
 
-An environmental monitoring platform is useless without some way of measuring the environment. Although the design includes a 0.1" header for expandability, light, temperature, and humidity sensing was included on board. Where possible, I2C compatible sensors were chosen for ease of integration and lowered parts count. The sensor characteristics are summarized in table \ref{sensor-specs}. The bottom two entries in the table consist of external sensors that were connected to the microcontroller's ADC. 
+An environmental monitoring platform is useless without some way of measuring the environment. Although the design includes a 0.1" header for expandability, light, temperature, and humidity sensing was included on board. Where possible, I2C compatible sensors were chosen for ease of integration and lowered parts count. The sensor characteristics are summarized in Table \ref{sensor-specs}. The bottom two entries in the table consist of external sensors that were connected to the microcontroller's ADC. 
 
 \begin{table}[h]
 \caption{Sensor specifications}
@@ -74,7 +76,7 @@ Soil Moisture & 24 mW & 3.5V - 20V & 0-50\% water by volume & 2\% & Analog & VH4
 
 The light sensor is the TSL2561. The response curve approximates the sensitivity of the human eye. Light levels are important in measuring solar insolation, which affects building heating and cooling schedules. This particular sensor contains two photodiodes on board - one more responsive to infra-red, and the other with an even full-spectrum frequency response curve. It is pre-calibrated from the manufacturer, and utilizes an SMBus/I2C interface.
 
-\section{Humidity and Temperature}
+\subsection{Humidity and Temperature}
 
 The board mounts an integrated relative humidity and temperature sensor from Taos: the TSL2561. Accurate measurement of relative humidity is highly dependent on the atmospheric temperature. As a result, most instrumentation-grade humidity sensors come with a temperature sensor for free. The sensor is based on sensing changes in capacitance, and comes pre-calibrated from the factory. Humidity and temperature must be known in order to determine heating and cooling energy expenditures.
 
@@ -85,8 +87,8 @@ The board mounts an integrated relative humidity and temperature sensor from Tao
 \label{fig:sbrk-proto}
 \end{figure}
 
-\section{Force}
-    
+\subsection{Other}
+\subsubsection{Force Sensing}
 A piezoelectric resistive force sensor from Flexiforce was tested. Force and pressure measurements are useful for measuring foot traffic. 
 
 \begin{figure}[h]
@@ -96,9 +98,8 @@ A piezoelectric resistive force sensor from Flexiforce was tested. Force and pre
 \label{fig:force-proto}
 \end{figure}
 
-\section{Soil Moisture}
-
-A capacitive soil moisture sensor from Vegetronix was tested. Soil moisture was an important environmental measure needed for ecoMOD 4, which had a ground source heat pump. The greater the soil moisture, the more thermal capacity the heat pump has to draw on. The sensor has an output voltage range of 0 to 3V. As the CC3200 ADC inputs can only tolerate a maximum voltage of 1.5V; the sensor output voltage must be divided by two for full range operation.
+\subsubsection{Soil Moisture Sensing}
+A capacitive soil moisture sensor from Vegetronix was also tested. Soil moisture was an important environmental measure needed for ecoMOD 4, which had a ground source heat pump. The greater the soil moisture, the more thermal capacity the heat pump has to draw on. The sensor has an output voltage range of 0 to 3V. As the CC3200 ADC inputs can only tolerate a maximum voltage of 1.46V; the sensor output voltage must be divided by two for full range operation. The same circuit used for the force sensor prototype can be used to interface the soil moisture sensor, with adjustments to the potentiometer resistance ratios.
 
 \section{Radio}
 
@@ -127,6 +128,8 @@ Device PCB          & 10.5        & 6.5        &
 \label{dimensions}
 \end{table}
 
+A DC-DC boost converter is included for usage with AA batteries. If the board is powered via USB, a 3V3 low-dropout oscillator is used. Power consumption of the board is measured by applying a multimeter to a sense resistor in the power circuit path.
+
 \section{Antenna Selection}
 
 \begin{figure}[h]
@@ -145,15 +148,15 @@ The sensor board looks for three qualities in its antenna, in decreasing importa
 \label{fig:pifaperf}
 \end{figure}
 
-In this design, an IFA was initially selected. An IFA has a simple structure, an omni-directional radiation pattern, and is very low-cost as it is fabricated as part of the PCB. It has an elliptical polarization, allowing it to receive both vertical and horizontally polarized waves\cite{huynh2000numerical}. This is important in an indoor environment as wireless waves often tend to become depolarized as they reflect off internal surfaces. For all these reasons, inverted-F antennas are extremely common in small electronic devices, and see common application in mobile handsets. One of the additional advantages of the IFA for prototyping is that it can be easily tuned by hand by fabricating the long arm of the F with excess length, and then scraping the excess surface copper until a good impedance match is obtained. An IFA antenna was designed, and the geometry is illustrated in figure \ref{fig:pifa}. The dielectric is standard 2-layer FR4 with a thickness of 1.6mm (63 mil) and 1 oz. copper traces and fills. The antenna  was simulated and found to have good S11 of -13dB in the 2.4 GHz band. 
+In this design, an IFA was initially selected. An IFA has a simple structure, an omni-directional radiation pattern, and is very low-cost as it is fabricated as part of the PCB. It has an elliptical polarization, allowing it to receive both vertical and horizontally polarized waves\cite{Huynh2000}. This is important in an indoor environment as wireless waves often tend to become depolarized as they reflect off internal surfaces. For all these reasons, inverted-F antennas are extremely common in small electronic devices, and see common application in mobile handsets. One of the additional advantages of the IFA for prototyping is that it can be easily tuned by hand by fabricating the long arm of the F with excess length, and then scraping the excess surface copper until a good impedance match is obtained. An IFA antenna was designed, and the geometry is illustrated in figure \ref{fig:pifa}. The dielectric is standard 2-layer FR4 with a thickness of 1.6mm (63 mil) and 1 oz. copper traces and fills. The antenna  was simulated and found to have good S11 of -13dB in the 2.4 GHz band. 
 
-However, after prototyping, a 50 Ohm microstrip to an edge-launched SMA connector was selected, and the antenna engineering work moved off the PCB. As a development platform, the ability to swap in a highly directional antenna is useful. Directional antennas are an easy way to extend wireless range without consuming more power, and locking the user in to using the provided PCB trace antenna is limiting. In the standard use case, the external whip antenna has similar performance to an F-antenna, but is just a little more expensive and bulky.
+However, after prototyping, a 50 Ohm microstrip to an edge-launched SMA connector was selected, and the antenna engineering work moved off the PCB. As a development platform, the ability to swap in a highly directional antenna is useful. Directional antennas are an easy way to extend wireless range without consuming more power, and locking the user in to using the provided PCB trace antenna is limiting.
 
 \section{Other Notes}
 
-The system is designed to run autonomously with little interaction by the user. Accordingly, there is only one button on the board, along with three status LEDs. If additional physical user interaction is required, they can be added to the 0.1" header. 
+The system is designed to run autonomously with little interaction by the user. Accordingly, there is only one reset button on the board, along with three status LEDs. If additional physical user interaction is required, they can be added to the 0.1" header. 
 
-In order to facilitate easy development, an FTDI dual serial to USB chip is included on the board's footprint. One port connects to the CC3200 UART, and another to the CC3200 JTAG pins. This simplifies the development process as a JTAG probe set is no longer needed for in-circuit debugging and firmware flashing. The trace powering the FTDI adapter can be depowered via jumper if the board is intended for long term battery operation, or the chip omitted entirely if large-scale production is anticipated. The previous generation MSP430-based nodes often had the problem that the JTAG circuit probes would go missing or be with another student, thus wasting debugging time.
+In order to facilitate easy development, an FTDI dual serial to USB chip is included on the board's footprint. One port connects to the CC3200 UART, and another to the CC3200 JTAG pins. This simplifies the development process as a JTAG probe set is no longer needed for in-circuit debugging and firmware flashing. The FTDI chip runs completely from USB power, so it consumes no energy in the battery-powered use case. The previous generation MSP430-based nodes often had the problem that the JTAG circuit probes often be unavailable, so this was a key upgrade.
 
 The CC3200 SoC is over-specified for the base use-case, and contains spare computational and memory capacity. The internal ARM-M4 micro-controller runs at 80 MHz from a pair of external 32.768 kHz and 40 MHz crystal oscillators. The model specified in this design contains 128 kB of RAM and is run from an 8 MB serial flash module accessed over the SPI bus. As the current firmware load consumes around 40 kilobytes of RAM during regular operation, expanded functionality can easily be programmed in the future.
 

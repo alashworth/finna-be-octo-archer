@@ -2,7 +2,7 @@
 
 Mains-powered boards remain on at all times, and can be accessed and queried via a web browser. This appendix lists and describes the resources used as of the publication date of this thesis.
 
-\section{Possible Node Responses}
+\section*{Possible Node Responses}
 \begin{itemize}
 \item 200 OK - The request was successful (some API calls may return 201 instead)
 \item 400 Bad Request - The request could not be understood or was missing required parameters.
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 \end{lstlisting}
 
-\section{Currently Supported Commands}
+\section*{Currently Supported Commands}
 
 For the board described in this document, the temperature sensor ID is 1, the humidity sensor ID is also 1, and the light sensor has ID 2.
 
@@ -58,3 +58,7 @@ id & the id number of the sensor & number, required \\ \bottomrule
 id & the id number of the sensor & number, required \\ \bottomrule
 \end{tabular}
 \end{table}
+
+\section*{Code Listing}
+
+The code was written using the QP Framework QM State-Machine modeling tool. The full source to this thesis can be found at \url{https://github.com/alashworth/cc3200-devl}.

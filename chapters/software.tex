@@ -1,22 +1,25 @@
 \chapter{Firmware Design}
 
-Software has a critical impact on hardware design. Typically, for a project like this, either ContikiOS\cite{dunkels2011contiki} or TinyOS\cite{levis2005tinyos} would be chosen. Both of them are componentized operating systems that are the de-facto standard in wireless embedded systems research. However, neither was used for this project. Instead, the board runs a port of the QP Framework\cite{samek2008practical}, an event-based actor framework combined with a very simple, cooperative multitasking kernel. The advantage of choosing a bare-metal solution is that the kernel can be swapped out in the future depending on application requirements. If necessary, a pre-emptive kernel could be used in order to provide hard real-time guarantees to executing software. No such capability is supported by TinyOS or ContikiOS, because of the resource constraints imposed by the platforms they must support.
+Software has a critical impact on hardware design. Typically, for a project like this, either ContikiOS or TinyOSwould be chosen. Both of them are componentized operating systems that are the de-facto standard in wireless embedded systems research. However, neither was used for this project. Instead, the board runs a port of the QP Framework\cite{Samek2008}, an event-based actor framework combined with a very simple, cooperative multitasking kernel. The advantage of choosing the QP Framework is that the cooperative kernel can be swapped out for a pre-emptive kernel in the future depending on application requirements for hard real-time guarantees. No such capability is supported by TinyOS or ContikiOS, because of the resource constraints imposed by the platforms they must support.
 
-As a result of running directly on the microcontroller, there is very little hardware abstraction; peripherals and MCU features must be directly programmed and accessed via the ROM functions provided by the manufacture. New events are easily created and assigned to the QP scheduler, which schedules all tasks in a run-to-completion fashion. For this design, given that the hard real-time demands of the networking subsystem are serviced in a separate, dedicated microcontroller in the CC3200 package, a cooperative, non-preemptive kernel was judged to be appropriate. It is simple to implement, uses less stack and memory space, and does not suffer from the complexity of traditional preemptive real-time operating systems.
- 
-\section{Radio Duty Cycling, Data Aggregation, and Low Power Modes}
+As a result of running directly on the microcontroller, there is very little hardware abstraction; peripherals and MCU features must be directly programmed and accessed via the ROM functions provided by the manufacturer. New events are easily created and assigned to the QP scheduler, which schedules all tasks in a run-to-completion fashion. Given that no functionality required real-time scheduling, a cooperative run-to-completion kernel was selected. It is simple to implement, uses less stack and memory space, and does not suffer from the complexity of traditional preemptive real-time operating systems.
 
-The node design is based on the following low duty cycle principle: the node is asleep for the majority of the time, wakes up quickly on an event, processes, and returns to sleep. For the lowest power consumption, the standby current and wakeup time (time to transition from sleep to active mode) must be minimized\cite{puccinelli2005wireless} since the the active portion of a sensor network application is typically extremely small\cite{shnayder2004simulating}. 
+\section{Standard Firmware Operation}
 
-!!!Integration of programming, communication, storage, and sensing allows researchers to utilize more functionality and develop more robust systems.
+The standard firmware load for the board consists of an always on HTTP server that reports sensor data according to HTTP get requests. The use-case for most of the ecoMOD boards has been to support mains-powered operation. Batteries, no matter how good, eventually self-discharge. Obtaining permission to replace sensor batteries while the house is being occupied has historically been difficult on occasion.  In addition, mains-powered operation allows for over-the-air updates to be applied to the firmware if necessary in an easy fashion.
 
-\todo{reword above paragraph}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\linewidth]{images/softwareflow}
+\caption[Firmware Event Timeline]{Typical Event Timeline for Default Firmware}
+\label{fig:softwareflow}
+\end{figure}
 
-Wireless transmission and receive are the dominant power consumers in most battery-powered devices. The board designed here is no exception, with energy consumption dominated by the transceiver. A representative pie chart has been calculated assuming the transmission of one 8-bit sample per second, and is shown below.
+\section{Battery-Powered Operation}
 
-\missingfigure{Relative power consumption of different subsystems}
+A low-power firmware load was developed for experimental purposes. The node firmware design for the battery powered case is based on the following low duty cycle principle: the node is asleep for the majority of the time, wakes up quickly on an sensor data acquisition event, processes the data, stores the data in a buffer , and then returns to sleep. If the buffer is full, it takes the data and posts it to an arbitrary URL. 
 
-From the pie chart, it is clear that the energy consumption bottleneck lies in the wireless radio. Several techniques can be used here to reduce power consumption: compressing the data stream, and employing burst transmissions.
+Wireless transmission and receive are the dominant power consumers in most battery-powered devices. The board designed here is no exception, with energy consumption dominated by the transceiver. In fact, the MCU consumes 3 to 6 mA of current while active, compared to 275 mA by the radio in full power transmit mode. It is clear that the energy consumption bottleneck lies in the wireless radio. Several techniques can be used here to reduce power consumption: compressing the data stream, and employing burst transmissions.
 
 \subsection{Burst Transmission}
 
@@ -25,16 +28,9 @@ A wireless sensor node spends most of time engaged in one-way communication. Ver
 Let the average power drawn by the radio during bursts be defined as $P_{B}$. Then, 
 
 \begin{equation}
-P_{B} = \frac{1}{T_{B}}[E_{oh} + T_{TX} +(T_{B}-T_{TX})P_{idle}]\cite{calhoun2005design}
+P_{B} = \frac{1}{T_{B}}[E_{oh} + T_{TX} +(T_{B}-T_{TX})P_{idle}]\cite{Calhoun2005}
 \end{equation}
 
 where $T_{B}$ is the period between bursts, $E_{oh}$ is the radio on/off power toggling cost, $T_{TX}$ is the transmission time, $P_{TX}$ is the power consumed during transmission, and $P_{idle}$ is the power consumed while the radio is asleep.
 
-
-
- 
-\section{Server Data Storage}
-\section{Rest API Interface}
-\section{Data Compression}
-\subsection{Goulomb Coding}
-
+From the equation, it can be seen that in the limit as $T_B$ approaches infinity, the power consumption approaches $P_idle$. Of course, an infinitely long burst period also leads to infinitely long latency and infinitely large storage. A compromise time between bursts period of 24 hours was chosen. The current board firmware load has approx. 80 kB of RAM available that can be set to persist during low-power deep sleep mode which is more than adequate (by a factor of 40) to support the storage of 16-bit samples acquired at one sample/minute. As a result, the board spends more than 98\% of its operating time in low-power deep sleep. 
