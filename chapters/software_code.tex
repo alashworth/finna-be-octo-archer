@@ -1,64 +1,8 @@
-\chapter{API Interface}
+\chapter{Code Listing}
 
-Mains-powered boards remain on at all times, and can be accessed and queried via a web browser. This appendix lists and describes the resources used as of the publication date of this thesis.
+This listing only contains the driver code for the off-chip sensor peripherals. A complete compilable code listing can be found at \url{https://github.com/alashworth/cc3200-sensor}.
 
-\section*{Possible Node Responses}
-\begin{itemize}
-\item 200 OK - The request was successful (some API calls may return 201 instead)
-\item 400 Bad Request - The request could not be understood or was missing required parameters.
-\item 404 Not Found - Resource not found.
-\item 405 Method Not Allowed - Requested method is not supported for the specified resource.
-\end{itemize}
-
-When querying for a sensor result, it will return in JSON format. Example:
-
-\begin{lstlisting}
-GET /sensor/temperature/{id} HTTP/1.1
-
-200 (OK)
-Content-Type: application/json
-
-{
-	"result": 22.5,
-	"timestamp": "2014-03-15T19:20:30Z"
-}
-\end{lstlisting}
-
-\section*{Currently Supported Commands}
-
-For the board described in this document, the temperature sensor ID is 1, the humidity sensor ID is also 1, and the light sensor has ID 2.
-
-\begin{table}[h]
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{GET} & \multicolumn{2}{l}{/sensor/{id}/temperature} \\ \midrule
-\multicolumn{3}{l}{Return the current temperature in Celsius.} \\
-\multicolumn{3}{c}{\textbf{Parameter}} \\
-\textbf{Name} & \textbf{Description} & \textbf{Details} \\
-id & the id number of the sensor & number, required \\ \bottomrule
-\end{tabular}
-\end{table}
-\begin{table}[h]
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{GET} & \multicolumn{2}{l}{/sensor/{id}/humidity} \\ \midrule
-\multicolumn{3}{l}{Return the current relative humidity as a percentage} \\
-\multicolumn{3}{c}{\textbf{Parameter}} \\
-\textbf{Name} & \textbf{Description} & \textbf{Details} \\
-id & the id number of the sensor & number, required \\ \bottomrule
-\end{tabular}
-\end{table}
-\begin{table}[h]
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{GET} & \multicolumn{2}{l}{/sensor/{id}/light} \\ \midrule
-\multicolumn{3}{l}{Return the current luminance in lux.} \\
-\multicolumn{3}{c}{\textbf{Parameter}} \\
-\textbf{Name} & \textbf{Description} & \textbf{Details} \\
-id & the id number of the sensor & number, required \\ \bottomrule
-\end{tabular}
-\end{table}
-
-\section*{Code Listing}
-
-The code was written using the QP Framework QM State-Machine modeling tool. The full source to this thesis can be found at \url{https://github.com/alashworth/cc3200-devl}.
+\lstinputlisting{res/HDC1050.h}
+\lstinputlisting{res/HDC1050.cpp}
+\lstinputlisting{res/LTR303ALS.h}
+\lstinputlisting{res/LTR303ALS.h}
